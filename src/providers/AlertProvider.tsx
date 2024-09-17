@@ -14,41 +14,41 @@ type MessageTypes = {
 
 export interface AlertContextType {
 	message: MessageTypes;
-	setMessage: (alert: MessageTypes ) => void;
+	setMessage: (alert: MessageTypes) => void;
 }
 
-const AlertContext = createContext<AlertContextType | null>( null );
+const AlertContext = createContext<AlertContextType | null>(null);
 
-export const useAlert = () => {
-	const context = useContext( AlertContext );
-	if ( !context ) {
-		throw new Error( "useAlert must be used within an AlertProvider" );
+export const useAlertContext = () => {
+	const context = useContext(AlertContext);
+	if (!context) {
+		throw new Error("useAlert must be used within an AlertProvider");
 	}
 	return context;
 };
 
 export const AlertProvider: FC<AlertProviderProps> = ({ children }) => {
-	const [ message, setMessage ] = useState<MessageTypes>( { alertType: "info", content: null, } );
+	const [message, setMessage] = useState<MessageTypes>({ alertType: "info", content: null, });
 
-	useEffect( () => {
+	useEffect(() => {
 		let timer: NodeJS.Timeout;
-		if ( message.content !== null ) {
-			timer = setTimeout( () => {
-				setMessage((message) => ({ ...message, content: null }) );
-			}, 2500 );
+		if (message.content !== null) {
+			timer = setTimeout(() => {
+				setMessage((message) => ({ ...message, content: null }));
+			}, 2500);
 		}
-		return () => clearTimeout( timer );
-	}, [message.content] );
+		return () => clearTimeout(timer);
+	}, [message.content]);
 
 	return (
 		<AlertContext.Provider
-			value={ {
+			value={{
 				message,
 				setMessage,
-			} }
+			}}
 		>
-			{ message.content && (
-				<Alert   style={{
+			{message.content && (
+				<Alert style={{
 					position: "fixed",
 					zIndex: 999,
 					top: "10%",
@@ -56,11 +56,11 @@ export const AlertProvider: FC<AlertProviderProps> = ({ children }) => {
 					right: 0,
 					marginRight: "10px"
 				}}
-					severity={ message.alertType }>
-					{ message.content }
+					severity={message.alertType}>
+					{message.content}
 				</Alert>
-			) }
-			{ children }
+			)}
+			{children}
 		</AlertContext.Provider>
 	);
 };

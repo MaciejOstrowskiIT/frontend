@@ -1,5 +1,5 @@
 import { useState, createContext, useContext, FC, ReactNode, useEffect } from "react";
-import { AuthResponse } from "../types/authTypes";
+import { AuthResponse } from "types/authTypes";
 
 export interface LoginProviderProps {
 	children: ReactNode;
@@ -18,12 +18,12 @@ interface UserData {
 	_id: string;
 }
 
-const LoginContext = createContext<LoginContextType | null>( null );
+const LoginContext = createContext<LoginContextType | null>(null);
 
-export const useLogin = () => {
-	const context = useContext( LoginContext );
-	if ( !context ) {
-		throw new Error( "useLogin must be used within an LoginProvider" );
+export const useLoginContext = () => {
+	const context = useContext(LoginContext);
+	if (!context) {
+		throw new Error("useLogin must be used within an LoginProvider");
 	}
 	return context;
 };
@@ -32,18 +32,18 @@ export const useLogin = () => {
 export const LoginProvider: FC<LoginProviderProps> = ({ children }) => {
 
 	//tutaj w zasadzie potrzebujemy przechowywac tylko JWT token
-	const [ username, setUsername ] = useState( sessionStorage.getItem( "token" ) ); 
+	const [username, setUsername] = useState(sessionStorage.getItem("token"));
 	//to tez jest potrzebne
-	const [ userData, setUserData ] = useState<UserData | null>( null );
+	const [userData, setUserData] = useState<UserData | null>(null);
 
 	const setUser = (data: AuthResponse) => {
-		sessionStorage.setItem( "token", data.token );
-		setUserData( {
+		sessionStorage.setItem("token", data.token);
+		setUserData({
 			username: data.user.username,
 			email: data.user.email,
 			_id: data.user._id,
-		} );
-		console.log( userData );
+		});
+		console.log(userData);
 	};
 
 	useEffect(() => {
@@ -53,19 +53,19 @@ export const LoginProvider: FC<LoginProviderProps> = ({ children }) => {
 		// 	email: res.data.user.email,
 		// 	_id: res.data.user._id,
 		// } );	
-	// )
+		// )
 	}, []) //pusty array, zeby wykonywal sie po kazdym refreshu contextu
 
 	return (
 		<LoginContext.Provider
-			value={ {
+			value={{
 				username,
 				setUsername,
 				setUser,
 				userData
 			}}
 		>
-			{ children }
+			{children}
 		</LoginContext.Provider>
 	);
 };

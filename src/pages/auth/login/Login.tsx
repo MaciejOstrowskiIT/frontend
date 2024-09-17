@@ -1,12 +1,11 @@
-import { FormValues, AuthResponse } from "../../../types/authTypes";
+import { FormValues, AuthResponse } from "types";
 import { useNavigate } from "react-router-dom";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { userSchema } from "../utils/userSchema";
-import { FC } from "react";
-import Button from "@mui/material/Button";
-import GoogleIcon from "@mui/icons-material/Google";
+import { FC, useEffect } from "react";
 import {
+	Button,
 	Avatar,
 	Box,
 	Checkbox,
@@ -16,13 +15,10 @@ import {
 	Typography,
 	useMediaQuery
 } from "@mui/material";
-import { Copyright } from "@mui/icons-material";
-import { FontSize, Text } from "../../../components/Text";
-import { FormInput } from "../../../components/FormInput";
-import { FormTextfield } from "../../../components/FormTextfield";
-import { useAuthorizedRequest } from "../../../hooks/useAuthorizedReq";
-import { useAlert } from "../../../providers/AlertProvider";
-import { useLogin } from "../../../providers/LoginProvider";
+import { Copyright, Google as GoogleIcon } from "@mui/icons-material";
+import { FontSize, Text, FormInput, FormTextfield } from "components";
+import { useAuthorizedRequest } from "hooks";
+import { useAlertContext, useLoginContext } from "providers"
 
 
 export const Login: FC = () => {
@@ -30,46 +26,50 @@ export const Login: FC = () => {
 	const {
 		handleSubmit,
 		control
-	} = useForm<Pick<FormValues, "email" | "password">>( {
-		resolver: yupResolver( userSchema ),
+	} = useForm<Pick<FormValues, "email" | "password">>({
+		resolver: yupResolver(userSchema),
 		mode: "onSubmit",
 		defaultValues: {
 			email: "",
 			password: "",
 		}
-	} );
+	});
 
-	const { setMessage } = useAlert();
+	const { setMessage } = useAlertContext();
 	const { postRequest } = useAuthorizedRequest();
-	const { setUser } = useLogin();
+	const { setUser } = useLoginContext();
 
 	//TODO: Refactor useMediaQuery
-	const largeScreen = useMediaQuery( "(min-width:2020px)" );
-	const normalScreen = useMediaQuery( "(min-width:1800px)" );
+	const largeScreen = useMediaQuery("(min-width:2020px)");
+	const normalScreen = useMediaQuery("(min-width:1800px)");
 
 	const navigateToDashboard = () => {
-		navigate( "/dashboard" );
+		navigate("/dashboard");
 	};
 	const navigateToRegister = () => {
-		navigate( "/auth/register" );
+		navigate("/auth/register");
 	};
+
+	useEffect(() => {
+		console.log('hello')
+	}, [])
 
 	const onSubmit: SubmitHandler<FormValues> = async (data) => {
 		console.log(data);
-		await postRequest<AuthResponse>( "api/login", data )
-			.then( (response) => {
-				if ( response.data.status === "200" ) {
-					setUser( response.data );
+		await postRequest<AuthResponse>("api/login", data)
+			.then((response) => {
+				if (response.data.status === "200") {
+					setUser(response.data);
 					console.log("response.data.user ", response.data.user)
 					console.log("response.data ", response.data)
-					setMessage( { content: response.data.message, alertType: "info" } );
+					setMessage({ content: response.data.message, alertType: "info" });
 					navigateToDashboard();
 				}
 				else {
-					setMessage( { content: response.data.message, alertType: "warning" } );
+					setMessage({ content: response.data.message, alertType: "warning" });
 				}
-			} )
-			.catch( (err) => console.log( err ) );
+			})
+			.catch((err) => console.log(err));
 	};
 
 
@@ -79,30 +79,30 @@ export const Login: FC = () => {
 	return (
 		<>
 			<Grid item
-				sx={ {
+				sx={{
 					borderRadius: normalScreen ? "0px 50px 50px 0px" : "50px",
 					background: "white",
 					height: "100%",
 					minWidth: normalScreen ? { xs: "10%", md: "10%" } : { xs: "80%", md: "80%" }
-				} }
-				xs={ normalScreen ? 6 : 12 }>
+				}}
+				xs={normalScreen ? 6 : 12}>
 				<Box
-					sx={ {
+					sx={{
 						px: largeScreen ? "70px" : "20px",
 						display: "flex",
 						flexDirection: "column",
 						alignItems: "center",
-					} }
+					}}
 				>
-					<Avatar sx={ { m: 1, bgcolor: "secondary.main" } }/>
-					<FormInput text={ "test" }
-						label={ "test" }
-						required={ true }
-						fullWidth={ true }/>
-					<Text size={ FontSize.BIG }
-						text={ "Sign in" }/>
+					<Avatar sx={{ m: 1, bgcolor: "secondary.main" }} />
+					<FormInput text={"test"}
+						label={"test"}
+						required={true}
+						fullWidth={true} />
+					<Text size={FontSize.BIG}
+						text={"Sign in"} />
 					<Typography component="h1"
-						sx={ { mt: "25%" } }
+						sx={{ mt: "25%" }}
 						variant="h3">
 						Welcome Back
 					</Typography>
@@ -110,12 +110,12 @@ export const Login: FC = () => {
 						Enter your email and password to access your account
 					</Typography>
 					<Box component="form"
-						onSubmit={ handleSubmit( onSubmit ) }
-						sx={ { mt: 5, } }>
+						onSubmit={handleSubmit(onSubmit)}
+						sx={{ mt: 5, }}>
 						<FormTextfield
-							control={ control }
-							name={ "email" }
-							margin={ "normal" }
+							control={control}
+							name={"email"}
+							margin={"normal"}
 							fullWidth
 							autoFocus
 							id="email"
@@ -123,9 +123,9 @@ export const Login: FC = () => {
 							autoComplete="email"
 						/>
 						<FormTextfield
-							control={ control }
-							name={ "password" }
-							margin={ "normal" }
+							control={control}
+							name={"password"}
+							margin={"normal"}
 							fullWidth
 							autoFocus
 							id="password"
@@ -134,15 +134,15 @@ export const Login: FC = () => {
 							autoComplete="current-password"
 						/>
 						<FormControlLabel
-							control={ <Checkbox value="remember"
-								color="primary"/> }
+							control={<Checkbox value="remember"
+								color="primary" />}
 							label="Remember me"
 						/>
 						<Button
 							type="submit"
 							fullWidth
 							variant="contained"
-							sx={ {
+							sx={{
 								mt: 3,
 								mb: 2,
 								color: "white",
@@ -150,15 +150,15 @@ export const Login: FC = () => {
 								borderRadius: "10px",
 								textDecoration: "none",
 								fontWeight: "bold"
-							} }
+							}}
 						>
 							Sign In
 						</Button>
 						<Button
 							fullWidth
 							variant="outlined"
-							sx={ { textTransform: "none", color: "black", borderRadius: "10px" } }
-						><GoogleIcon sx={ { pr: 1 } }/>
+							sx={{ textTransform: "none", color: "black", borderRadius: "10px" }}
+						><GoogleIcon sx={{ pr: 1 }} />
 							Sign In with Google
 						</Button>
 						<Grid container>
@@ -166,20 +166,20 @@ export const Login: FC = () => {
 								xs>
 								<Link href="#"
 									variant="body2"
-									sx={ { color: "black", textDecoration: "none", fontWeight: "bold" } }>
+									sx={{ color: "black", textDecoration: "none", fontWeight: "bold" }}>
 									Forgot password?
 								</Link>
 							</Grid>
 							<Grid item>
 								<Link
-									onClick={ navigateToRegister }
+									onClick={navigateToRegister}
 									variant="body2"
-									sx={ { color: "black", cursor: "pointer", fontWeight: "bold" } }>
-									{ "Don't have an account? Sign Up" }
+									sx={{ color: "black", cursor: "pointer", fontWeight: "bold" }}>
+									{"Don't have an account? Sign Up"}
 								</Link>
 							</Grid>
 						</Grid>
-						<Copyright sx={ { mt: 5 } }/>
+						<Copyright sx={{ mt: 5 }} />
 					</Box>
 				</Box>
 			</Grid>

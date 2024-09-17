@@ -6,6 +6,7 @@
       "dom.iterable",
       "esnext"
     ],
+
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -19,30 +20,11 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "paths": {
+    "baseUrl": "src",
+    // "paths": {
 
-//      "components/*": [
-//        "./src/components/*"
-//      ],
-//      "pages/*": [
-//        "./src/pages/*"
-//      ],
-//      "routes/*": [
-//        "./src/routes/*"
-//      ],
-//      "styles/*": [
-//        "./src/styles/*"
-//      ],
-//      "types/*": [
-//        "./src/types/*"
-//      ],
-//      "utils/*": [
-//        "./src/utils/*"
-//      ],
-//      "interfaces/*": [
-//        "./src/interfaces/*"
-//      ]
-    }
+
+    // }
   },
   "include": [
     "src/*",

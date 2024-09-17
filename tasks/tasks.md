@@ -16,3 +16,10 @@ REST:
     - mozemy sprobowac zrobic z tego paczki npm, ktore bedziemy instalowac w projektach
     - np.: transaction-types-pkg
 6. Github Actions + precommit hooks
+
+
+
+
+//////17.09
+1. Zrob MUI theme
+2. Sprobuj zrobic ovverride'y dla pewnych rzeczy, jak np: paleta kolorow, button, card itp; zacznij od Typography i usun Text.tsx
