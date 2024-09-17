@@ -29,12 +29,15 @@ export const Auth = () => {
 				alignItems="center"
 				justifyContent="center"
 				minHeight="100vh"
+
+
 				sx={ {
 					backgroundImage: "url(https://source.unsplash.com/random?wallpapers)",
 					backgroundRepeat: "no-repeat",
 					backgroundSize: "cover",
 					backgroundPosition: "center",
-					height: "100vh"
+					height: "100vh",
+					padding: "10px",
 				} }>
 				<Grid container
 					direction="row"
@@ -45,6 +48,7 @@ export const Auth = () => {
 					columnSpacing={ { md: 0 } }
 					sx={ {
 						maxWidth: mobile ? { xs: "80%", md: "80%" } : { xs: "100%", md: "0" }
+
 					} }
 				>
 					<Grid item

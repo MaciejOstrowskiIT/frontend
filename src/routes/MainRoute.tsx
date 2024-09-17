@@ -11,12 +11,8 @@ import { Utils } from "../pages/debug/Utils";
 import { Personalization } from "../pages/personalization/Personalization";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { AdminPanel } from "../pages/content/AdminPanel";
-import axios from "axios";
 
 export const MainRoute = () => {
-	// axios.post('http://127.0.0.1:4002/api/set-permissions')
-	console.log("https://code-with-me.global.jetbrains.com/BoTN2JZycQ4TyQrqbI28cg#p=WS&fp=FED017071C15112C78C0A22AB804DD4C69EF4D5097C7310245452404F815C0D4&newUi=true")
-	console.log("test")
 	return (
 		<Router>
 			<AlertProvider>

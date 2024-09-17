@@ -13,7 +13,6 @@ import { useEffect, useState } from "react";
 import { FormSelect, SelectOption } from "../../components/FormSelect";
 import CssBaseline from "@mui/material/CssBaseline";
 
-
 /*
 1. Sender account
 	- te dane powinny byc autouzupelnione.
