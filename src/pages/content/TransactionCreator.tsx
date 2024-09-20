@@ -1,18 +1,12 @@
-import { useAuthorizedRequest } from "../../hooks/useAuthorizedReq";
-import { Box, Grid, InputLabel, MenuItem, Paper, Select, TextField, } from "@mui/material";
-import { Transaction } from "../../types/transactionTypes";
-import Button from "@mui/material/Button";
-import { FormTextfield } from "../../components/FormTextfield";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { AuthResponse } from "../../types/authTypes";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { transactionSchema } from "../dashboard/utils/transactionSchema";
-import { useAlert } from "../../providers/AlertProvider";
-import { useLogin } from "../../providers/LoginProvider";
 import { useEffect, useState } from "react";
-import { FormSelect, SelectOption } from "../../components/FormSelect";
-import CssBaseline from "@mui/material/CssBaseline";
-
+import { useAuthorizedRequest } from "hooks";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { AuthResponse, Transaction } from "types";
+import { transactionSchema } from "../dashboard/utils/transactionSchema";
+import { useAlertContext, useLoginContext } from "providers";
+import { FormSelect, FormTextfield, SelectOption } from "components";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { Button, CssBaseline, Grid, Paper } from "@mui/material";
 /*
 1. Sender account
 	- te dane powinny byc autouzupelnione.
@@ -45,18 +39,18 @@ type Data = {
 type FormValuesType = Omit<Transaction, "date" | "receiverName">
 
 export const TransactionCreator = () => {
-	const { postRequest, getRequest } = useAuthorizedRequest();
-	const { setMessage } = useAlert();
-	const { userData } = useLogin();
-	const [ userDetails, setUserDetails ] = useState( "" ); // accountNumber lub senderAccountNumber
-	const [ accountParams, setAccountsParams ] = useState( "8" );
-	const [ accountOptions, setAccountOptions ] = useState<SelectOption[]>( [] );
+	const {postRequest, getRequest} = useAuthorizedRequest();
+	const {setMessage} = useAlertContext();
+	const {userData} = useLoginContext();
+	const [userDetails, setUserDetails] = useState(""); // accountNumber lub senderAccountNumber
+	const [accountParams, setAccountsParams] = useState("8");
+	const [accountOptions, setAccountOptions] = useState<SelectOption[]>([]);
 
 	const {
 		handleSubmit,
 		control,
-	} = useForm<FormValuesType>( {
-		resolver: yupResolver( transactionSchema ),
+	} = useForm<FormValuesType>({
+		resolver: yupResolver(transactionSchema),
 		mode: "onSubmit",
 		defaultValues: {
 			debit: 0,
@@ -65,110 +59,104 @@ export const TransactionCreator = () => {
 			senderName: userData?.username,
 			senderAccount: userDetails,
 			receiverAccount: "", //receiverAccountNumber
-		}
-	} );
+		},
+	});
 
 
-	const mapAccountsToOptions = ({ userAccounts }: Data): SelectOption[] => {
-		return userAccounts.map( (account) => ({
+	const mapAccountsToOptions = ({userAccounts}: Data): SelectOption[] => {
+		return userAccounts.map((account) => ({
 			value: account.accountNumber,
-			label: account.userName
-		}) );
+			label: account.userName,
+		}));
 	};
 
-	const getUserProfile = async () => {
-		await getRequest<UserDetails>( `api/get-user-data/${ userData?._id }` )
-			.then( (res) => {
-				setUserDetails( res.data.accountNumber );
-			} )
-			.catch( (err) => console.log( err ) );
+	const getUserProfile = async() => {
+		await getRequest<UserDetails>(`api/get-user-data/${userData?._id}`).then((res) => {
+			setUserDetails(res.data.accountNumber);
+		}).catch((err) => console.log(err));
 	};
-	const findAccounts = async () => {
-		await getRequest<Data>( `api/find-accounts/${ accountParams }` )
-			.then( (res) => {
-				const mappedAccounts = mapAccountsToOptions( res.data );
-				setAccountOptions( mappedAccounts );
-			} )
-			.catch( (err) => console.log( err ) );
+	const findAccounts = async() => {
+		await getRequest<Data>(`api/find-accounts/${accountParams}`).then((res) => {
+			const mappedAccounts = mapAccountsToOptions(res.data);
+			setAccountOptions(mappedAccounts);
+		}).catch((err) => console.log(err));
 	};
 
-	useEffect( () => {
+	useEffect(() => {
 		getUserProfile();
 		findAccounts();
-	}, [] );
+	}, []);
 
 
-	const onSubmit: SubmitHandler<FormValuesType> = async (data) => {
-		const receiverObj = accountOptions.find( (account) => account.value === data.receiverAccount );
-		const body = { ...data, receiverName: receiverObj?.label };
-		await postRequest<AuthResponse>( "api/add-new-transaction", body )
-			.then( () => {
-				setMessage( { alertType: "success", content: "Transaction successfully created!" } );
-			} )
-			.catch( (err) => setMessage( { alertType: "error", content: "Something went wrong" } ) );
+	const onSubmit: SubmitHandler<FormValuesType> = async(data) => {
+		const receiverObj = accountOptions.find((account) => account.value === data.receiverAccount);
+		const body = {...data, receiverName: receiverObj?.label};
+		await postRequest<AuthResponse>("api/add-new-transaction", body).then(() => {
+			setMessage({alertType: "success", content: "Transaction successfully created!"});
+		}).catch((err) => setMessage({alertType: "error", content: "Something went wrong"}));
 	};
 
 	return (
 		<>
 			<CssBaseline/>
 			<Grid
-				sx={ { padding: 2, display: "flex", justifyContent: "center" } }>
-				<Paper elevation={ 2 }
-					sx={ { p: 4 } }>
-					<form onSubmit={ handleSubmit( onSubmit ) }>
+				sx={{padding: 2, display: "flex", justifyContent: "center"}}>
+				<Paper elevation={2}
+					sx={{p: 4}}>
+					<form onSubmit={handleSubmit(onSubmit)}>
 						<Grid container
-							spacing={ 2 }>
+							spacing={2}>
 							<Grid item
-								xs={ 12 }
-								md={ 12 }
-								sx={ { display: "flex", flexDirection: "column", gap: "10px" } }>
-								<FormTextfield control={ control }
-									name={ "debit" }
+								xs={12}
+								md={12}
+								sx={{display: "flex", flexDirection: "column", gap: "10px"}}>
+								<FormTextfield control={control}
+									name={"debit"}
 									label="Debit"
 									type="number"
 									fullWidth
 								/>
-								<FormTextfield control={ control }
-									name={ "credit" }
+								<FormTextfield control={control}
+									name={"credit"}
 									label="Credit"
 									type="number"
 									fullWidth
 								/>
-								<FormTextfield control={ control }
-									name={ "value" }
+								<FormTextfield control={control}
+									name={"value"}
 									label="Value"
 									type="number"
 									fullWidth
 								/>
 							</Grid>
 							<Grid item
-								xs={ 12 }
-								md={ 12 }
-								sx={ { display: "flex", flexDirection: "column", gap: "10px" } }>
-								<FormTextfield control={ control }
-									name={ "senderName" }
+								xs={12}
+								md={12}
+								sx={{display: "flex", flexDirection: "column", gap: "10px"}}>
+								<FormTextfield control={control}
+									name={"senderName"}
 									label="Sender Name"
 									fullWidth
 									disabled
 								/>
-								<FormTextfield control={ control }
-									name={ "senderAccount" }
+								<FormTextfield control={control}
+									name={"senderAccount"}
 									label="Sender Account"
 									fullWidth
 									disabled
 								/>
 								<FormSelect
-									control={ control }
+									control={control}
 									name="receiverAccount"
 									label="Receiver Account"
 									id="receiver-account-id"
-									options={ accountOptions }
+									options={accountOptions}
 								/>
 								{/*
 							mozesz tutaj dodac niekontrolowanego inputa, ktory bedzie sie pojawial
 							po kliknieciu switcha z nazwa 'Show account number'
 							* conditional rendering
-							*/ }
+							*/}
 							</Grid>
 						</Grid>
 						<Button type="submit"

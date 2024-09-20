@@ -1,6 +1,4 @@
-import { AppBar, Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography } from "@mui/material";
-import Button from "@mui/material/Button";
-import Toolbar from "@mui/material/Toolbar";
+import { AppBar, Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography, Button, Toolbar } from "@mui/material";
 
 export const AdminPanel = () => {
 	return (

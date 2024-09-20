@@ -1,8 +1,8 @@
 import Button from "@mui/material/Button";
-import { useAlert } from "../../providers/AlertProvider";
+import { useAlertContext } from "providers";
 
 export const Utils = () => {
-	const { setMessage } = useAlert();
+	const { setMessage } = useAlertContext();
 	return (
 		<>
 			<h1>

@@ -1,5 +1,5 @@
 import { Menu } from "./menu/Menu";
-import { Box, Grid, Paper } from "@mui/material";
+import { Grid } from "@mui/material";
 import { useState } from "react";
 
 export const Dashbaord = () => {
@@ -11,9 +11,6 @@ export const Dashbaord = () => {
 		<Grid container
 			sx={ { flexDirection: "column" } }>
 			<Menu/>
-			{/*<TransactionsTable/>*/ }
-			{/*<TransactionCreator/>*/ }
-			{/*</Menu>*/ }
 		</Grid>
 	);
 };

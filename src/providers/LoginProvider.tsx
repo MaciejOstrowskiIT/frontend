@@ -1,5 +1,5 @@
 import { useState, createContext, useContext, FC, ReactNode, useEffect } from "react";
-import { AuthResponse } from "types/authTypes";
+import { AuthResponse } from "types/AuthResponse";
 
 export interface LoginProviderProps {
 	children: ReactNode;

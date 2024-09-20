@@ -1,8 +1,8 @@
-import { FormValues, AuthResponse } from "types";
+import { FormValues, AuthResponse, LoginFormFields } from "types";
 import { useNavigate } from "react-router-dom";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { userSchema } from "../utils/userSchema";
+import { loginSchema } from "./loginSchema";
 import { FC, useEffect } from "react";
 import {
 	Button,
@@ -13,7 +13,7 @@ import {
 	Grid,
 	Link,
 	Typography,
-	useMediaQuery
+	useMediaQuery,
 } from "@mui/material";
 import { Copyright, Google as GoogleIcon } from "@mui/icons-material";
 import { FontSize, Text, FormInput, FormTextfield } from "components";
@@ -25,19 +25,19 @@ export const Login: FC = () => {
 	const navigate = useNavigate();
 	const {
 		handleSubmit,
-		control
-	} = useForm<Pick<FormValues, "email" | "password">>({
-		resolver: yupResolver(userSchema),
-		mode: "onSubmit",
+		control,
+	} = useForm<LoginFormFields>({
+		resolver: yupResolver(loginSchema),
+		mode: "all",
 		defaultValues: {
 			email: "",
 			password: "",
-		}
+		},
 	});
 
-	const { setMessage } = useAlertContext();
-	const { postRequest } = useAuthorizedRequest();
-	const { setUser } = useLoginContext();
+	const {setMessage} = useAlertContext();
+	const {postRequest} = useAuthorizedRequest();
+	const {setUser} = useLoginContext();
 
 	//TODO: Refactor useMediaQuery
 	const largeScreen = useMediaQuery("(min-width:2020px)");
@@ -49,27 +49,23 @@ export const Login: FC = () => {
 	const navigateToRegister = () => {
 		navigate("/auth/register");
 	};
-
 	useEffect(() => {
 		console.log('hello')
 	}, [])
 
-	const onSubmit: SubmitHandler<FormValues> = async (data) => {
+	const onSubmit: SubmitHandler<FormValues> = async(data) => {
 		console.log(data);
-		await postRequest<AuthResponse>("api/login", data)
-			.then((response) => {
-				if (response.data.status === "200") {
-					setUser(response.data);
-					console.log("response.data.user ", response.data.user)
-					console.log("response.data ", response.data)
-					setMessage({ content: response.data.message, alertType: "info" });
-					navigateToDashboard();
-				}
-				else {
-					setMessage({ content: response.data.message, alertType: "warning" });
-				}
-			})
-			.catch((err) => console.log(err));
+		await postRequest<AuthResponse>("api/login", data).then((response) => {
+			if (response.data.status === "200") {
+				setUser(response.data);
+				console.log("response.data.user ", response.data.user)
+				console.log("response.data ", response.data)
+				setMessage({content: response.data.message, alertType: "info"});
+				navigateToDashboard();
+			} else {
+				setMessage({content: response.data.message, alertType: "warning"});
+			}
+		}).catch((err) => console.log(err));
 	};
 
 
@@ -83,7 +79,7 @@ export const Login: FC = () => {
 					borderRadius: normalScreen ? "0px 50px 50px 0px" : "50px",
 					background: "white",
 					height: "100%",
-					minWidth: normalScreen ? { xs: "10%", md: "10%" } : { xs: "80%", md: "80%" }
+					minWidth: normalScreen ? {xs: "10%", md: "10%"} : {xs: "80%", md: "80%"},
 				}}
 				xs={normalScreen ? 6 : 12}>
 				<Box
@@ -94,15 +90,15 @@ export const Login: FC = () => {
 						alignItems: "center",
 					}}
 				>
-					<Avatar sx={{ m: 1, bgcolor: "secondary.main" }} />
+					<Avatar sx={{m: 1, bgcolor: "secondary.main"}}/>
 					<FormInput text={"test"}
 						label={"test"}
 						required={true}
-						fullWidth={true} />
+						fullWidth={true}/>
 					<Text size={FontSize.BIG}
-						text={"Sign in"} />
+						text={"Sign in"}/>
 					<Typography component="h1"
-						sx={{ mt: "25%" }}
+						sx={{mt: "25%"}}
 						variant="h3">
 						Welcome Back
 					</Typography>
@@ -111,7 +107,7 @@ export const Login: FC = () => {
 					</Typography>
 					<Box component="form"
 						onSubmit={handleSubmit(onSubmit)}
-						sx={{ mt: 5, }}>
+						sx={{mt: 5}}>
 						<FormTextfield
 							control={control}
 							name={"email"}
@@ -135,7 +131,7 @@ export const Login: FC = () => {
 						/>
 						<FormControlLabel
 							control={<Checkbox value="remember"
-								color="primary" />}
+								color="primary"/>}
 							label="Remember me"
 						/>
 						<Button
@@ -149,7 +145,7 @@ export const Login: FC = () => {
 								backgroundColor: "black",
 								borderRadius: "10px",
 								textDecoration: "none",
-								fontWeight: "bold"
+								fontWeight: "bold",
 							}}
 						>
 							Sign In
@@ -157,8 +153,8 @@ export const Login: FC = () => {
 						<Button
 							fullWidth
 							variant="outlined"
-							sx={{ textTransform: "none", color: "black", borderRadius: "10px" }}
-						><GoogleIcon sx={{ pr: 1 }} />
+							sx={{textTransform: "none", color: "black", borderRadius: "10px"}}
+						><GoogleIcon sx={{pr: 1}}/>
 							Sign In with Google
 						</Button>
 						<Grid container>
@@ -166,7 +162,7 @@ export const Login: FC = () => {
 								xs>
 								<Link href="#"
 									variant="body2"
-									sx={{ color: "black", textDecoration: "none", fontWeight: "bold" }}>
+									sx={{color: "black", textDecoration: "none", fontWeight: "bold"}}>
 									Forgot password?
 								</Link>
 							</Grid>
@@ -174,12 +170,12 @@ export const Login: FC = () => {
 								<Link
 									onClick={navigateToRegister}
 									variant="body2"
-									sx={{ color: "black", cursor: "pointer", fontWeight: "bold" }}>
+									sx={{color: "black", cursor: "pointer", fontWeight: "bold"}}>
 									{"Don't have an account? Sign Up"}
 								</Link>
 							</Grid>
 						</Grid>
-						<Copyright sx={{ mt: 5 }} />
+						<Copyright sx={{mt: 5}}/>
 					</Box>
 				</Box>
 			</Grid>
