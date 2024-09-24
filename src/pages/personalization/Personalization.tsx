@@ -9,45 +9,47 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { personalizationSchema } from './personalizationSchema';
 
 type PersonalizationFormDataValues = {
-	email: string,
 	address: string;
 	fullName: string;
 	gender: string;
 	motherName: string;
-	NIP: string
-	PESEL: string
+	identification: string;
+	identificationType: 'NIP' | 'PESEL';
 	isCompanyAccount: boolean
 }
 
 export const Personalization: React.FC = () => {
-	const {userData} = useLoginContext();
-	const {setMessage} = useAlertContext();
-	const {postRequest, getRequest} = useAuthorizedRequest();
-	const [isCompany, setIsCompany] = useState(false);
+	const { userData } = useLoginContext();
+	const { setMessage } = useAlertContext();
+	const { postRequest, getRequest } = useAuthorizedRequest();
 	const {
 		handleSubmit,
 		control,
+		setValue,
+		getValues,
+		watch
 	} = useForm<PersonalizationFormDataValues>({
 		resolver: yupResolver(personalizationSchema),
-		mode: 'onSubmit',
+		mode: 'all',
 		defaultValues: {
-			email: userData?.email,
 			address: '',
 			fullName: '',
 			gender: '',
 			motherName: '',
-			NIP: ' ',
-			PESEL: ' ',
+			identification: '',
+			identificationType: 'PESEL',
 			isCompanyAccount: false,
 		},
 	});
 
 
-	const fetchDataWithHook = async() => {
-		await getRequest<PersonalizationFormDataValues[]>(`api/get-user-data/${userData?._id}`).then(() => {
-		}).catch((err) => {
-			console.error('Error fetching transactions:', err);
-		});
+	const fetchDataWithHook = async () => {
+		await getRequest<PersonalizationFormDataValues[]>(`api/get-user-data/${userData?._id}`)
+			.then((res) => {
+				console.log(res)
+			}).catch((err) => {
+				console.log('Error fetching user data:', err);
+			});
 	};
 
 	useEffect(() => {
@@ -55,22 +57,27 @@ export const Personalization: React.FC = () => {
 	}, []);
 
 
-	const onSubmit: SubmitHandler<PersonalizationFormDataValues> = async(data) => {
+	const onSubmit: SubmitHandler<PersonalizationFormDataValues> = async (data) => {
 		await postRequest<AuthResponse>('api/edit-data', data).then(() => {
-			setMessage({alertType: 'success', content: 'Edit done successfully!'});
+			setMessage({ alertType: 'success', content: 'Edit done successfully!' });
 			// fetchDataWithHook()
-		}).catch(() => setMessage({alertType: 'error', content: 'Something went wrong'}));
+		}).catch(() => setMessage({ alertType: 'error', content: 'Something went wrong' }));
 	};
 
+	const handleSwitchChange = () => {
+		const identificationType = getValues('identificationType')
+		setValue('identificationType', identificationType === 'PESEL' ? 'NIP' : 'PESEL')
+	}
+
 	return (
-		<Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-			<Card sx={{padding: 2, marginTop: 2, marginBottom: 2, maxWidth: 1000, width: '100%'}}>
+		<Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+			<Card sx={{ padding: 2, marginTop: 2, marginBottom: 2, maxWidth: 1000, width: '100%' }}>
 				<Typography variant="h5"
 					gutterBottom>
 					Personalization
 				</Typography>
 				<form onSubmit={handleSubmit(onSubmit)}>
-					<Divider variant="fullWidth"/>
+					<Divider variant="fullWidth" />
 					<CardContent>
 						<Grid container
 							spacing={3}>
@@ -78,7 +85,7 @@ export const Personalization: React.FC = () => {
 								xs={12}
 								sm={6}
 								md={6}
-								sx={{display: 'flex', flexDirection: 'column'}}>
+								sx={{ display: 'flex', flexDirection: 'column' }}>
 								<FormTextfield
 									control={control}
 									name={'address'}
@@ -86,7 +93,7 @@ export const Personalization: React.FC = () => {
 									id="address"
 									label="Address"
 									autoComplete="address"
-									sx={{marginTop: '10px'}}
+									sx={{ marginTop: '10px' }}
 								/>
 								<FormTextfield
 									control={control}
@@ -95,7 +102,7 @@ export const Personalization: React.FC = () => {
 									id="fullName"
 									label="Full Name"
 									autoComplete="name"
-									sx={{marginTop: '10px'}}
+									sx={{ marginTop: '10px' }}
 								/>
 								<FormTextfield
 									control={control}
@@ -104,14 +111,14 @@ export const Personalization: React.FC = () => {
 									id="gender"
 									label="Gender"
 									autoComplete="gender"
-									sx={{marginTop: '10px'}}
+									sx={{ marginTop: '10px' }}
 								/>
 							</Grid>
 							<Grid item
 								xs={12}
 								sm={6}
 								md={6}
-								sx={{display: 'flex', flexDirection: 'column'}}>
+								sx={{ display: 'flex', flexDirection: 'column' }}>
 								<FormTextfield
 									control={control}
 									name={'motherName'}
@@ -119,24 +126,26 @@ export const Personalization: React.FC = () => {
 									id="motherName"
 									label="Mother's Name"
 									autoComplete="motherName"
-									sx={{marginTop: '10px'}}
+									sx={{ marginTop: '10px' }}
 								/>
-								<FormControlLabel control={<Switch checked={isCompany}
-									onChange={() => setIsCompany(!isCompany)}/>}
-									label="Company"/>
+								<FormControlLabel
+									control={<Switch
+										onChange={() => handleSwitchChange()}
+									/>}
+									label="Company" />
 								<FormTextfield
 									control={control}
-									name={isCompany ? 'NIP' : 'PESEL'}
+									name={'identification'}
 									fullWidth
-									id={isCompany ? 'NIP' : 'PESEL'}
-									label={isCompany ? 'NIP' : 'PESEL'}
-									sx={{marginTop: '10px', marginBottom: '10px'}}
+									id={'identification'}
+									label={watch('identificationType')}
+									sx={{ marginTop: '10px', marginBottom: '10px' }}
 								/>
 							</Grid>
 						</Grid>
 					</CardContent>
-					<Divider variant="fullWidth"/>
-					<CardActions sx={{justifyContent: 'flex-end'}}>
+					<Divider variant="fullWidth" />
+					<CardActions sx={{ justifyContent: 'flex-end' }}>
 						<Button
 							type="submit"
 							variant="contained"
