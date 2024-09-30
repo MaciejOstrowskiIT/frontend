@@ -10,53 +10,57 @@ import { useAuthorizedRequest } from "hooks";
 import { useAlertContext } from "providers";
 import { FormTextfield } from "components";
 
+const defaultValues: RegisterFormFields = {
+	username: "",
+	email: "",
+	password: "",
+	repeatPassword: "",
+}
+
 export const Register: FC = () => {
 	const { setMessage } = useAlertContext();
 	const { postRequest } = useAuthorizedRequest();
-
 	const navigate = useNavigate();
+
 	const {
 		control,
 		handleSubmit,
 	} = useForm<RegisterFormFields>({
 		resolver: yupResolver(registerSchema),
 		mode: 'all',
-		defaultValues: {
-			username: "",
-			email: "",
-			password: "",
-			repeatPassword: "",
-		},
+		defaultValues
 	});
 
-	//TODO: Refactor useMediaQuery
 	const largeScreen = useMediaQuery("(min-width:2020px)");
 	const normalScreen = useMediaQuery("(min-width:1800px)");
-	const navigateToLogin = () => {
-		navigate("/auth/login");
-	};
+
+	const navigateToLogin = () => navigate("/auth/login");
 
 	const onSubmit: SubmitHandler<RegisterFormFields> = async (data) => {
-		await postRequest<AuthResponse>("api/signup", data).then((response) => {
+		try {
+			const response = await postRequest<AuthResponse>("api/signup", data);
 			if (response.data.status === "201") {
-				setMessage({ content: "test", alertType: "success" });
+				setMessage({ content: "Registration successful!", alertType: "success" });
 				navigate("/auth/login");
 			} else {
-				return console.log(response.data.message);
+				setMessage({ content: response.data.message, alertType: "error" });
 			}
-		}).catch((err) => setMessage({ content: err, alertType: "error" }))
+		} catch (err) {
+			setMessage({ content: "err", alertType: "error" }); // TODO: change content: "err"
+		}
 	};
 
-
 	return (
-		<Grid item
+		<Grid
+			item
+			xs={normalScreen ? 6 : 12}
 			sx={{
 				borderRadius: normalScreen ? "0px 50px 50px 0px" : "50px",
 				background: "white",
 				height: "100%",
 				minWidth: normalScreen ? { xs: "10%", md: "10%" } : { xs: "80%", md: "80%" },
 			}}
-			xs={normalScreen ? 6 : 12}>
+		>
 			<Box
 				sx={{
 					px: largeScreen ? "70px" : "20px",
@@ -65,27 +69,16 @@ export const Register: FC = () => {
 					alignItems: "center",
 				}}
 			>
-				<Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-				</Avatar>
-				<Typography component="h1"
-					variant="h5">
-					Sign up
-				</Typography>
-				<Typography component="h1"
-					sx={{ mt: 3 }}
-					variant="h3">
-					Welcome
-				</Typography>
-				<Typography component="p">
-					Enter your email and password to create your new account
-				</Typography>
-				<Box component="form"
-					onSubmit={handleSubmit(onSubmit)}
-					sx={{ mt: 5 }}>
+				<Avatar sx={{ m: 1, bgcolor: "secondary.main" }} />
+				<Typography component="h1" variant="h5">Sign up</Typography>
+				<Typography component="h1" sx={{ mt: 3 }} variant="h3">Welcome</Typography>
+				<Typography component="p">Enter your email and password to create your new account</Typography>
+
+				<Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ mt: 5 }}>
 					<FormTextfield
 						control={control}
-						name={"email"}
-						margin={"normal"}
+						name="email"
+						margin="normal"
 						fullWidth
 						id="email"
 						label="Email Address"
@@ -93,32 +86,30 @@ export const Register: FC = () => {
 					/>
 					<FormTextfield
 						control={control}
-						name={"username"}
-						margin={"normal"}
+						name="username"
+						margin="normal"
 						fullWidth
 						id="username"
-						type="text"
 						label="Username"
 					/>
 					<FormTextfield
 						control={control}
-						name={"password"}
-						margin={"normal"}
+						name="password"
+						margin="normal"
 						fullWidth
 						id="password"
-						type="password"
 						label="Password"
+						type="password"
 						autoComplete="current-password"
 					/>
 					<FormTextfield
 						control={control}
-						name={"repeatPassword"}
-						margin={"normal"}
+						name="repeatPassword"
+						margin="normal"
 						fullWidth
 						id="repeatPassword"
-						type="password"
 						label="Repeat Password"
-						autoComplete="current-password"
+						type="password"
 					/>
 					<Button
 						type="submit"
@@ -130,18 +121,17 @@ export const Register: FC = () => {
 							color: "white",
 							backgroundColor: "black",
 							borderRadius: "10px",
-							textDecoration: "none",
 							fontWeight: "bold",
 						}}
 					>
 						Sign Up
 					</Button>
 					<Button
-						type="submit"
 						fullWidth
 						variant="outlined"
 						sx={{ textTransform: "none", color: "black", borderRadius: "10px" }}
-					><GoogleIcon sx={{ pr: 1 }} />
+					>
+						<GoogleIcon sx={{ pr: 1 }} />
 						Sign Up with Google
 					</Button>
 					<Grid container>
@@ -149,8 +139,9 @@ export const Register: FC = () => {
 							<Link
 								onClick={navigateToLogin}
 								variant="body2"
-								sx={{ color: "black", cursor: "pointer", fontWeight: "bold" }}>
-								{"Already registered? Sign In!"}
+								sx={{ color: "black", cursor: "pointer", fontWeight: "bold" }}
+							>
+								Already registered? Sign In!
 							</Link>
 						</Grid>
 					</Grid>

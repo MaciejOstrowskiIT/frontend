@@ -20,6 +20,11 @@ import { FontSize, Text, FormTextfield } from "components";
 import { useAuthorizedRequest } from "hooks";
 import { useAlertContext, useLoginContext } from "providers"
 
+const defaultValues: LoginFormFields = {
+	email: "",
+	password: "",
+};
+
 
 export const Login: FC = () => {
 	const navigate = useNavigate();
@@ -29,11 +34,10 @@ export const Login: FC = () => {
 	} = useForm<LoginFormFields>({
 		resolver: yupResolver(loginSchema),
 		mode: "all",
-		defaultValues: {
-			email: "",
-			password: "",
-		},
+		defaultValues,
 	});
+
+
 
 	const { setMessage } = useAlertContext();
 	const { postRequest } = useAuthorizedRequest();
